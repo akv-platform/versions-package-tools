@@ -4,7 +4,7 @@ param (
     [Parameter(Mandatory)] [string] $AccessToken,
     [Parameter(Mandatory)] [string] $EventType,
     [Parameter(Mandatory)] [string] $ToolVersions,
-    [Parameter(Mandatory)] [bool] $PublishReleases
+    [Parameter(Mandatory)] [string] $PublishReleases
 )
 
 Import-Module (Join-Path $PSScriptRoot "github-api.psm1")
@@ -14,7 +14,7 @@ function Queue-Builds {
         [Parameter(Mandatory)] [object] $GitHubApi,
         [Parameter(Mandatory)] [string] $ToolVersions,
         [Parameter(Mandatory)] [string] $EventType,
-        [Parameter(Mandatory)] [bool] $PublishReleases
+        [Parameter(Mandatory)] [string] $PublishReleases
     )
         
     $eventPayload = @{
