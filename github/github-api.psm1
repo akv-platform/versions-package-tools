@@ -91,11 +91,11 @@ class GitHubApi
         $this.InvokeRestMethod($url, 'POST', $null, $body)
     }
 
-    [void] DispatchWorkflow([string]$EventType, [object]$EventPayload) {
-        $url = "dispatches"
+    [void] CreateWorkflowDispatch([string]$WorkflowFileName, [string]$Ref, [object]$Inputs) {
+        $url = "actions/workflows/${WorkflowFileName}/dispatches"
         $body = @{
-            event_type = $EventType
-            client_payload = $EventPayload
+            ref = $Ref
+            inputs = $Inputs
         } | ConvertTo-Json
 
         $this.InvokeRestMethod($url, 'POST', $null, $body)

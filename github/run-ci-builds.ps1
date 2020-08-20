@@ -2,7 +2,8 @@ param (
     [Parameter(Mandatory)] [string] $RepositoryOwner,
     [Parameter(Mandatory)] [string] $RepositoryName,
     [Parameter(Mandatory)] [string] $AccessToken,
-    [Parameter(Mandatory)] [string] $EventType,
+    [Parameter(Mandatory)] [string] $WorkflowFileName,
+    [Parameter(Mandatory)] [string] $WorkflowDispatchRef,
     [Parameter(Mandatory)] [string] $ToolVersions,
     [Parameter(Mandatory)] [string] $PublishReleases
 )
@@ -13,20 +14,21 @@ function Queue-Builds {
     param (
         [Parameter(Mandatory)] [object] $GitHubApi,
         [Parameter(Mandatory)] [string] $ToolVersions,
-        [Parameter(Mandatory)] [string] $EventType,
+        [Parameter(Mandatory)] [string] $WorkflowFileName,
+        [Parameter(Mandatory)] [string] $WorkflowDispatchRef,
         [Parameter(Mandatory)] [string] $PublishReleases
     )
         
-    $eventPayload = @{
-        PublishReleases = $PublishReleases
+    $inputs = @{
+        PUBLISH_RELEASES = $PublishReleases
     }
     
     $ToolVersions.Split(',') | ForEach-Object { 
         $version = $_.Trim()
-        $eventPayload.ToolVersion = $version
-        
+        $inputs.VERSION = $version
+
         Write-Host "Queue build for $version..."
-        $GitHubApi.DispatchWorkflow($EventType, $eventPayload)
+        $GitHubApi.CreateWorkflowDispatch($WorkflowFileName, $WorkflowDispatchRef, $inputs)
     }
 }
 
@@ -35,5 +37,6 @@ $gitHubApi = Get-GitHubApi -AccountName $RepositoryOwner -ProjectName $Repositor
 Write-Host "Versions to build: $ToolVersions"
 Queue-Builds -GitHubApi $gitHubApi `
              -ToolVersions $ToolVersions `
-             -EventType $EventType `
+             -WorkflowFileName $WorkflowFileName `
+             -WorkflowDispatchRef $WorkflowDispatchRef `
              -PublishReleases $PublishReleases 
